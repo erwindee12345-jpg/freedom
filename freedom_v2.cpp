@@ -1,13 +1,13 @@
 #include <iostream>
+#include <memory>
 
 struct Session {
     std::string user;
     int requests;   
 };
 
-static void logout(Session *session) {
+static void logout(std::unique_ptr<Session> session) {
     std::cout << "logging out " << session->user << "\n";
-    delete session;
 }
 
 static void audit(const Session *session) {
@@ -16,10 +16,9 @@ static void audit(const Session *session) {
 
 int main() {
 
-    Session *session = new Session{"alice", 3};
-    audit(session);
-    logout(session);
+    auto session = std::make_unique<Session>(Session{"alice", 3});
+    audit(session.get());
+    logout(std::move(session));
 
-    session = nullptr;
     return 0;
 }
